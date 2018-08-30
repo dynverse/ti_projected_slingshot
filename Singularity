@@ -8,7 +8,7 @@ Bootstrap: shub
 From: dynverse/dynwrap:bioc
 
 %labels
-    version 0.1.0
+    version 0.1.1
 
 %post
     apt-get install -y libcgal-dev libglu1-mesa-dev libglu1-mesa-dev

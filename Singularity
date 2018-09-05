@@ -10,14 +10,13 @@ From: dynverse/dynwrap:bioc
 %labels
     version 0.1.2
 
-%post
-    chmod -R a+r /code
-    chmod a+x /code
-    apt-get install -y libcgal-dev libglu1-mesa-dev
-    R -e 'devtools::install_github("kstreet13/slingshot")'
-
 %files
     . /code
+
+%post
+    chmod -R 755 '/code'
+    apt-get install -y libcgal-dev libglu1-mesa-dev
+    R -e 'devtools::install_github("kstreet13/slingshot")'
 
 %runscript
     exec Rscript /code/run.R

@@ -137,7 +137,7 @@ milestone_network <- lineages %>%
 # calculate cluster dimred_milestones
 milestone_ids <- unique(grouping)
 dimred_milestones <- t(sapply(milestone_ids, function(cli){
-  colMeans(dimred[names(which(cli == grouping)),,drop=F])
+  colMeans(dimred[names(which(cli == grouping)), , drop = FALSE])
 }))
 
 

@@ -1,6 +1,6 @@
 FROM dynverse/dynwrap:bioc
 
-LABEL version 0.1.4
+LABEL version 0.1.5
 
 RUN apt-get install -y libcgal-dev libglu1-mesa-dev
 

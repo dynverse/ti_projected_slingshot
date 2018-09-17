@@ -3,7 +3,7 @@ docker_repository: dynverse/ti_projected_slingshot
 singularity_collection: 1568
 container_url: https://github.com/dynverse/ti_projected_slingshot
 name: Projected Slingshot
-type: algorithm
+source: adaptation
 implementation_id: slingshot
 platform: R
 trajectory_types:

@@ -1,10 +1,10 @@
 FROM dynverse/dynwrap:bioc
 
-LABEL version 0.1.5
-
 RUN apt-get install -y libcgal-dev libglu1-mesa-dev
 
 RUN R -e 'devtools::install_github("kstreet13/slingshot")'
+
+LABEL version 0.1.5
 
 ADD . /code
 

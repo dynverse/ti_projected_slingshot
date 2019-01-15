@@ -8,14 +8,14 @@ Bootstrap: shub
 From: dynverse/dynwrap:bioc
 
 %labels
-    version 0.1.7
+    version 0.1.7.1
 
 %files
     . /code
 
 %post
     chmod -R 755 '/code'
-    apt-get install -y libcgal-dev libglu1-mesa-dev
+    apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev
     R -e 'devtools::install_github("kstreet13/slingshot")'
 
 %runscript

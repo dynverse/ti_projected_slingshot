@@ -1,37 +1,37 @@
-library(jsonlite)
-library(readr)
-library(dplyr)
-library(purrr)
+#!/usr/local/bin/Rscript
 
-library(princurve)
-library(cluster)
-library(slingshot)
+library(readr, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
+library(dyndimred, warn.conflicts = FALSE)
+library(dynwrap, warn.conflicts = FALSE)
+library(dyncli, warn.conflicts = FALSE)
 
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+library(princurve, warn.conflicts = FALSE)
+library(cluster, warn.conflicts = FALSE)
+suppressWarnings(library(slingshot, warn.conflicts = FALSE))
 
-data <- read_rds("/ti/input/data.rds")
-params <- jsonlite::read_json("/ti/input/params.json")
+#####################################
+###           LOAD DATA           ###
+#####################################
 
-#' @examples
-#' data <- dyntoy::generate_dataset(id = "test", num_cells = 300, num_features = 300, model = "linear") %>% c(., .$prior_information)
-#' params <- yaml::read_yaml("containers/projected_slingshot/definition.yml")$parameters %>%
-#'   {.[names(.) != "forbidden"]} %>%
-#'   purrr::map(~ .$default)
+task <- dyncli::main()
 
-counts <- data$counts
-start_id <- data$start_id
-end_id <- data$end_id
+#' @example
+#' task <- dyncli::main(
+#'   args = "--dataset ~/example/test.loom --dimred landmark_mds --output ~/example/output.h5" %>% strsplit(" ") %>% first(),
+#'   definition_location = "~/Workspace/dynverse/methods/ti_angle/definition.yml"
+#' )
+
+params <- task$params
+counts <- task$counts
+start_id <- task$priors$start_id
+end_id <- task$priors$end_id
 
 #   ____________________________________________________________________________
 #   Preprocessing                                                           ####
 
-start_cell <-
-  if (!is.null(start_id)) {
-    sample(start_id, 1)
-  } else {
-    NULL
-  }
+start_cell <- if (!is.null(start_id)) { sample(start_id, 1) }  else { NULL }
 
 # normalization & preprocessing
 # from the vignette of slingshot
@@ -140,19 +140,19 @@ dimred_milestones <- t(sapply(milestone_ids, function(cli){
   colMeans(dimred[names(which(cli == grouping)), , drop = FALSE])
 }))
 
-
-# create output object
-output <- lst(
-  cell_ids = rownames(dimred),
-  milestone_ids,
-  milestone_network,
-  dimred_milestones,
-  dimred,
-  grouping = grouping,
-  timings = checkpoints
-)
-
 #   ____________________________________________________________________________
 #   Save output                                                             ####
 
-write_rds(output, "/ti/output/output.rds")
+output <-
+  wrap_data(
+    cell_ids = rownames(counts)
+  ) %>%
+  dynwrap::add_dimred_projection(
+    milestone_network = milestone_network,
+    dimred = dimred,
+    dimred_milestones = dimred_milestones,
+    grouping = grouping
+  )
+  add_timings(checkpoints)
+
+dyncli::write_output(output, task$output)

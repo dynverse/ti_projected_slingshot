@@ -152,7 +152,7 @@ output <-
     dimred = dimred,
     dimred_milestones = dimred_milestones,
     grouping = grouping
-  )
+  ) %>%
   add_timings(checkpoints)
 
 dyncli::write_output(output, task$output)

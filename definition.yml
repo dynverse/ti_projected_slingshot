@@ -1,6 +1,6 @@
 method:
-  id: slingshot
-  name: Slingshot
+  id: projected_slingshot
+  name: Projected Slingshot
   source: tool
   platform: R
   license: Artistic-2.0
@@ -26,9 +26,7 @@ wrapper:
     - multifurcation
     - binary_tree
     - tree
-  example: /code/example.R
-  input_required:
-    - counts
+  input_required: counts
   input_optional:
     - start_id
     - end_id

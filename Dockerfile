@@ -6,6 +6,6 @@ RUN apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libgsl-dev
 
 RUN R -e 'devtools::install_github("kstreet13/slingshot")'
 
-COPY definition.yml example.R run.R /code/
+COPY definition.yml example.sh run.R /code/
 
 ENTRYPOINT ["/code/run.R"]

@@ -45,7 +45,7 @@ parameters:
     type: logical
     default: yes
     description: 'logical, whether to allow cells shared between lineages to be reweighted
-      during curve-fitting. If \code{TRUE}, cells shared between  lineages will be
+      during curve-fitting. If `TRUE`, cells shared between  lineages will be
       weighted by: distance to nearest curve / distance to curve.'
   - id: reassign
     type: logical
@@ -100,6 +100,6 @@ parameters:
     - tricube
     - density
     description: character denoting how to determine the appropriate amount of shrinkage
-      for a branching lineage. Accepted values are the same as for \code{kernel} in
-      [density()] (default is \code{"cosine"}), as well as \code{"tricube"} and \code{"density"}.
+      for a branching lineage. Accepted values are the same as for `kernel` in
+      `density()` (default is `"cosine"`), as well as `"tricube"` and `"density"`.
       See 'Details' for more.

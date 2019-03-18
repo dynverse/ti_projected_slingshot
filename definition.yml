@@ -34,11 +34,11 @@ wrapper:
 parameters:
   - id: shrink
     type: numeric
-    default: 1.0
+    default: 1
     distribution:
       type: expuniform
-      upper: 1.0
-      lower: 0.0e+00
+      lower: 0
+      upper: 1
     description: logical or numeric between 0 and 1, determines whether and how much
       to shrink branching lineages toward their average prior to the split.
   - id: reweight
@@ -61,7 +61,7 @@ parameters:
     default: 0.001
     distribution:
       type: expuniform
-      upper: 100000.0
+      upper: 100000
       lower: 1.0e-05
     description: numeric, determines the convergence criterion. Percent change in
       the total distance from cells to their projections along curves must be less

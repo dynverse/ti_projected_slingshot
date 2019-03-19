@@ -23,7 +23,7 @@ task <- dyncli::main()
 #'   definition_location = "~/Workspace/dynverse/methods/ti_angle/definition.yml"
 #' )
 
-params <- task$params
+parameters <- task$parameters
 counts <- task$counts
 start_id <- task$priors$start_id
 end_id <- task$priors$end_id
@@ -105,14 +105,14 @@ sds <- slingshot(
   grouping,
   start.clus = start.clus,
   end.clus = end.clus,
-  shrink = params$shrink,
-  reweight = params$reweight,
-  reassign = params$reassign,
-  thresh = params$thresh,
-  maxit = params$maxit,
-  stretch = params$stretch,
-  smoother = params$smoother,
-  shrink.method = params$shrink.method
+  shrink = parameters$shrink,
+  reweight = parameters$reweight,
+  reassign = parameters$reassign,
+  thresh = parameters$thresh,
+  maxit = parameters$maxit,
+  stretch = parameters$stretch,
+  smoother = parameters$smoother,
+  shrink.method = parameters$shrink.method
 )
 
 # TIMING: done with method

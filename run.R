@@ -1,57 +1,41 @@
-library(jsonlite)
-library(readr)
-library(dplyr)
-library(purrr)
+#!/usr/local/bin/Rscript
 
-library(princurve)
-library(cluster)
-library(slingshot)
+requireNamespace("dyncli", quietly = TRUE)
+task <- dyncli::main()
 
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+library(dplyr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
+library(dynwrap, warn.conflicts = FALSE)
 
-data <- read_rds("/ti/input/data.rds")
-params <- jsonlite::read_json("/ti/input/params.json")
+requireNamespace("princurve", quietly = TRUE)
+requireNamespace("cluster", quietly = TRUE)
+requireNamespace("irlba", quietly = TRUE)
 
-#' @examples
-#' data <- dyntoy::generate_dataset(id = "test", num_cells = 300, num_features = 300, model = "linear") %>% c(., .$prior_information)
-#' params <- yaml::read_yaml("containers/projected_slingshot/definition.yml")$parameters %>%
-#'   {.[names(.) != "forbidden"]} %>%
-#'   purrr::map(~ .$default)
+suppressWarnings(library(slingshot, warn.conflicts = FALSE))
 
-counts <- data$counts
-start_id <- data$start_id
-end_id <- data$end_id
+#####################################
+###           LOAD DATA           ###
+#####################################
 
+parameters <- task$parameters
+expression <- task$expression
+start_id <- task$priors$start_id
+end_id <- task$priors$end_id
+
+#####################################
+###        INFER TRAJECTORY       ###
+#####################################
 #   ____________________________________________________________________________
 #   Preprocessing                                                           ####
 
-start_cell <-
-  if (!is.null(start_id)) {
-    sample(start_id, 1)
-  } else {
-    NULL
-  }
-
-# normalization & preprocessing
-# from the vignette of slingshot
-FQnorm <- function(counts){
-  rk <- apply(counts, 2, rank, ties.method = "min")
-  counts.sort <- apply(counts, 2, sort)
-  refdist <- apply(counts.sort, 1, median)
-  norm <- apply(rk, 2, function(r) refdist[r])
-  rownames(norm) <- rownames(counts)
-  return(norm)
-}
-
-expr <- t(log1p(FQnorm(t(counts))))
+start_cell <- if (!is.null(start_id)) { sample(start_id, 1) }  else { NULL }
 
 # TIMING: done with preproc
 checkpoints <- list(method_afterpreproc = as.numeric(Sys.time()))
 
 #   ____________________________________________________________________________
 #   Dimensionality reduction                                                ####
-pca <- prcomp(expr)
+pca <- irlba::prcomp_irlba(expression, n = 20)
 
 # this code is adapted from the expermclust() function in TSCAN
 # the only difference is in how PCA is performed
@@ -105,14 +89,14 @@ sds <- slingshot(
   grouping,
   start.clus = start.clus,
   end.clus = end.clus,
-  shrink = params$shrink,
-  reweight = params$reweight,
-  reassign = params$reassign,
-  thresh = params$thresh,
-  maxit = params$maxit,
-  stretch = params$stretch,
-  smoother = params$smoother,
-  shrink.method = params$shrink.method
+  shrink = parameters$shrink,
+  reweight = parameters$reweight,
+  reassign = parameters$reassign,
+  thresh = parameters$thresh,
+  maxit = parameters$maxit,
+  stretch = parameters$stretch,
+  smoother = parameters$smoother,
+  shrink.method = parameters$shrink.method
 )
 
 # TIMING: done with method
@@ -140,19 +124,19 @@ dimred_milestones <- t(sapply(milestone_ids, function(cli){
   colMeans(dimred[names(which(cli == grouping)), , drop = FALSE])
 }))
 
-
-# create output object
-output <- lst(
-  cell_ids = rownames(dimred),
-  milestone_ids,
-  milestone_network,
-  dimred_milestones,
-  dimred,
-  grouping = grouping,
-  timings = checkpoints
-)
-
 #   ____________________________________________________________________________
 #   Save output                                                             ####
 
-write_rds(output, "/ti/output/output.rds")
+output <-
+  wrap_data(
+    cell_ids = rownames(expression)
+  ) %>%
+  dynwrap::add_dimred_projection(
+    milestone_network = milestone_network,
+    dimred = dimred,
+    dimred_milestones = dimred_milestones,
+    grouping = grouping
+  ) %>%
+  add_timings(checkpoints)
+
+dyncli::write_output(output, task$output)

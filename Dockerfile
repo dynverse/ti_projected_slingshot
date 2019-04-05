@@ -1,11 +1,11 @@
-FROM dynverse/dynwrap:bioc
+FROM dynverse/dynwrapr:v0.1.0
+
+ARG GITHUB_PAT
 
 RUN apt-get update && apt-get install -y libcgal-dev libglu1-mesa-dev libgsl-dev
 
 RUN R -e 'devtools::install_github("kstreet13/slingshot")'
 
-LABEL version 0.1.7.2
+COPY definition.yml run.R example.sh /code/
 
-ADD . /code
-
-ENTRYPOINT Rscript /code/run.R
+ENTRYPOINT ["/code/run.R"]

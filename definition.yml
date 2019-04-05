@@ -26,7 +26,7 @@ wrapper:
     - multifurcation
     - binary_tree
     - tree
-  input_required: counts
+  input_required: expression
   input_optional:
     - start_id
     - end_id

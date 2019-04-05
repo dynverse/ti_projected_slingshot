@@ -1,57 +1,41 @@
 #!/usr/local/bin/Rscript
 
-library(readr, warn.conflicts = FALSE)
+requireNamespace("dyncli", quietly = TRUE)
+task <- dyncli::main()
+
 library(dplyr, warn.conflicts = FALSE)
 library(purrr, warn.conflicts = FALSE)
-library(dyndimred, warn.conflicts = FALSE)
 library(dynwrap, warn.conflicts = FALSE)
-library(dyncli, warn.conflicts = FALSE)
 
-library(princurve, warn.conflicts = FALSE)
-library(cluster, warn.conflicts = FALSE)
+requireNamespace("princurve", quietly = TRUE)
+requireNamespace("cluster", quietly = TRUE)
+requireNamespace("irlba", quietly = TRUE)
+
 suppressWarnings(library(slingshot, warn.conflicts = FALSE))
 
 #####################################
 ###           LOAD DATA           ###
 #####################################
 
-task <- dyncli::main()
-
-#' @example
-#' task <- dyncli::main(
-#'   args = "--dataset ~/example/test.loom --dimred landmark_mds --output ~/example/output.h5" %>% strsplit(" ") %>% first(),
-#'   definition_location = "~/Workspace/dynverse/methods/ti_angle/definition.yml"
-#' )
-
 parameters <- task$parameters
-counts <- task$counts
+expression <- task$expression
 start_id <- task$priors$start_id
 end_id <- task$priors$end_id
 
+#####################################
+###        INFER TRAJECTORY       ###
+#####################################
 #   ____________________________________________________________________________
 #   Preprocessing                                                           ####
 
 start_cell <- if (!is.null(start_id)) { sample(start_id, 1) }  else { NULL }
-
-# normalization & preprocessing
-# from the vignette of slingshot
-FQnorm <- function(counts){
-  rk <- apply(counts, 2, rank, ties.method = "min")
-  counts.sort <- apply(counts, 2, sort)
-  refdist <- apply(counts.sort, 1, median)
-  norm <- apply(rk, 2, function(r) refdist[r])
-  rownames(norm) <- rownames(counts)
-  return(norm)
-}
-
-expr <- t(log1p(FQnorm(t(counts))))
 
 # TIMING: done with preproc
 checkpoints <- list(method_afterpreproc = as.numeric(Sys.time()))
 
 #   ____________________________________________________________________________
 #   Dimensionality reduction                                                ####
-pca <- prcomp(expr)
+pca <- irlba::prcomp_irlba(expression, n = 20)
 
 # this code is adapted from the expermclust() function in TSCAN
 # the only difference is in how PCA is performed
@@ -145,7 +129,7 @@ dimred_milestones <- t(sapply(milestone_ids, function(cli){
 
 output <-
   wrap_data(
-    cell_ids = rownames(counts)
+    cell_ids = rownames(expression)
   ) %>%
   dynwrap::add_dimred_projection(
     milestone_network = milestone_network,

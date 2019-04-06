@@ -56,7 +56,7 @@ optpoint2 <- which.max(proj$dist_ind)-1
 # we will take more than 3 PCs only if both methods recommend it
 optpoint <- max(c(min(c(optpoint1, optpoint2)), 3))
 dimred <- pca$x[, seq_len(optpoint)]
-rownames(rd) <- rownames(expression)
+rownames(dimred) <- rownames(expression)
 
 #   ____________________________________________________________________________
 #   Clustering                                                              ####

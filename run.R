@@ -50,7 +50,7 @@ optpoint1 <- which.min(sapply(2:10, function(i) {
 # https://stackoverflow.com/questions/2018178/finding-the-best-trade-off-point-on-a-curve
 x <- cbind(1:20, pca$sdev[1:20])
 line <- x[c(1, nrow(x)),]
-proj <- project_to_curve(x, line)
+proj <- princurve::project_to_curve(x, line)
 optpoint2 <- which.max(proj$dist_ind)-1
 
 # we will take more than 3 PCs only if both methods recommend it
@@ -60,7 +60,7 @@ dimred <- pca$x[, seq_len(optpoint)]
 #   ____________________________________________________________________________
 #   Clustering                                                              ####
 clusterings <- lapply(3:10, function(K){
-  pam(dimred, K) # we generally prefer PAM as a more robust alternative to k-means
+  cluster::pam(dimred, K) # we generally prefer PAM as a more robust alternative to k-means
 })
 
 # take one more than the optimal number of clusters based on average silhouette width
@@ -131,7 +131,7 @@ output <-
   wrap_data(
     cell_ids = rownames(expression)
   ) %>%
-  dynwrap::add_dimred_projection(
+  add_dimred_projection(
     milestone_network = milestone_network,
     dimred = dimred,
     dimred_milestones = dimred_milestones,

@@ -13,8 +13,8 @@ manuscript:
   publication_date: '2018-06-19'
 
 container:
-  docker: dynverse/ti_slingshot
-  url: https://github.com/dynverse/ti_slingshot
+  docker: dynverse/ti_projected_slingshot
+  url: https://github.com/dynverse/ti_projected_slingshot
 
 wrapper:
   type: trajectory

@@ -1,7 +1,7 @@
 method:
   id: projected_slingshot
   name: Projected Slingshot
-  source: tool
+  source: adaptation
   platform: R
   license: Artistic-2.0
   url: https://github.com/kstreet13/slingshot
